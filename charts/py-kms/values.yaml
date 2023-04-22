@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: pykmsorg/py-kms
+  repository: ghcr.io/py-kms-organization/py-kms
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: python3
@@ -20,8 +20,7 @@ py-kms:
     LOGSIZE: 2
     LOGFILE: /var/log/py-kms.log
     HWID: RANDOM
-    SQLITE: true
-    IP: 0.0.0.0
+    IP: '::'
 
 serviceAccount: {}
   # # Specifies whether a service account should be created

@@ -1,7 +1,7 @@
 # This is a minimized version from docker/docker-py3-kms/Dockerfile without SQLite support to further reduce image size
 FROM alpine:3.15
 
-ENV IP 0.0.0.0
+ENV IP ::
 ENV PORT 1688
 ENV EPID ""
 ENV LCID 1033
@@ -12,15 +12,12 @@ ENV HWID RANDOM
 ENV LOGLEVEL INFO
 ENV LOGFILE STDOUT
 ENV LOGSIZE ""
-ENV TYPE MINIMAL
 
-COPY ./py-kms /home/py-kms
-COPY docker/requirements_minimal.txt /home/py-kms/requirements.txt
+COPY docker/docker-py3-kms-minimal/requirements.txt /home/py-kms/requirements.txt
 RUN apk add --no-cache --update \
 bash \
   python3 \
   py3-pip \
-  python3-tkinter \
   ca-certificates \
   shadow \
   tzdata \
@@ -31,6 +28,7 @@ bash \
   # Fix undefined timezone, in case the user did not mount the /etc/localtime
   && ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 
+COPY ./py-kms /home/py-kms
 COPY docker/entrypoint.py /usr/bin/entrypoint.py
 COPY docker/start.py /usr/bin/start.py
 
