@@ -192,8 +192,8 @@ for server OSes and Office >=5', 'def' : None, 'des' : "clientcount"},
         'sql'        : {'help' : 'Use this option to store request information from unique clients in an SQLite database. Deactivated by default.', 'def' : False,
                         'file': os.path.join('.', 'pykms_database.db'), 'des' : "sqlite"},
         'hwid'       : {'help' : 'Use this option to specify a HWID. The HWID must be an 16-character string of hex characters. \
-The default is \"364F463A8863D35F\" or type \"RANDOM\" to auto generate the HWID.',
-                        'def' : "364F463A8863D35F", 'des' : "hwid"},
+Type \"RANDOM\" to auto-generate the HWID.',
+                        'def' : "RANDOM", 'des' : "hwid"},
         'time0'      : {'help' : 'Maximum inactivity time (in seconds) after which the connection with the client is closed. If \"None\" (default) serve forever.',
                         'def' : None, 'des' : "timeoutidle"},
         'time1'      : {'help' : 'Set the maximum time to wait for sending / receiving a request / response. Default is no timeout.',
@@ -481,7 +481,7 @@ class kmsServerHandler(socketserver.BaseRequestHandler):
                         try:
                                 self.data = self.request.recv(1024)
                                 if self.data == '' or not self.data:
-                                        pretty_printer(log_obj = loggersrv.warning,
+                                        pretty_printer(log_obj = loggersrv.debug, # use debug, as the healthcheck will spam this
                                                        put_text = "{reverse}{yellow}{bold}No data received.{end}")
                                         break
                         except socket.error as e:

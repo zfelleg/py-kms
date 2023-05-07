@@ -12,6 +12,7 @@ ENV HWID RANDOM
 ENV LOGLEVEL INFO
 ENV LOGFILE STDOUT
 ENV LOGSIZE ""
+ENV WEBUI 0
 
 COPY docker/docker-py3-kms-minimal/requirements.txt /home/py-kms/requirements.txt
 RUN apk add --no-cache --update \
@@ -21,7 +22,6 @@ bash \
   ca-certificates \
   shadow \
   tzdata \
-  netcat-openbsd \
   && pip3 install --no-cache-dir -r /home/py-kms/requirements.txt \
   && adduser -S py-kms -G users -s /bin/bash \
   && chown py-kms:users /home/py-kms \
@@ -30,14 +30,14 @@ bash \
 
 COPY ./py-kms /home/py-kms
 COPY docker/entrypoint.py /usr/bin/entrypoint.py
+COPY docker/healthcheck.py /usr/bin/healthcheck.py
 COPY docker/start.py /usr/bin/start.py
-
-RUN chmod 755 /usr/bin/entrypoint.py
+RUN chmod 555 /usr/bin/entrypoint.py /usr/bin/healthcheck.py /usr/bin/start.py
 
 WORKDIR /home/py-kms
 
 EXPOSE ${PORT}/tcp
 
-HEALTHCHECK --interval=5m --timeout=3s --start-period=10s --retries=4 CMD echo | nc -z ${IP%% *} ${PORT} || exit 1
+HEALTHCHECK --interval=5m --timeout=10s --start-period=10s --retries=3 CMD /usr/bin/python3 /usr/bin/healthcheck.py
 
 ENTRYPOINT ["/usr/bin/python3", "-u", "/usr/bin/entrypoint.py"]
