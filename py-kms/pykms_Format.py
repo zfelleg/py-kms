@@ -18,9 +18,9 @@ def enco(strg, typ = 'latin-1'):
 def deco(strg, typ = 'latin-1'):
     if isinstance(strg, bytes):
         return strg.decode(typ)
-            
+
 def byterize(obj):
-    
+
     def do_encode(dictio, key):
         if isinstance(dictio[key], str) and len(dictio[key]) > 0 and key not in ['SecondaryAddr']:
             dictio[key] = dictio[key].encode('latin-1')
@@ -46,12 +46,12 @@ def justify(astring, indent = 35, break_every = 100):
         for i in range(0, len(longest[1]), break_every):
             lines.append(longest[1][i : i + break_every])
         splitted[longest[0]] = str_indent.join(lines)
-        
+
     if len(splitted) > 1:
         justy = str_indent.join(splitted)
     else:
         justy = str_indent + str_indent.join(splitted)
-   
+
     return justy
 
 ##----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ def unformat_message(symbolic_string_list):
         """
         pattern = r"(?<!\{)\{([^}]+)\}(?!\})"
         picktxt, pickarrw = [ [] for _ in range(2) ]
-                                       
+
         for item in symbolic_string_list:
                 try:
                         # only for py-kms MsgMap.
@@ -352,7 +352,7 @@ class ShellMessage(object):
             # Save everything that would otherwise go to stdout.
             outstream = ShellMessage.Collect()
             sys.stdout = outstream
-            
+
             try:
                 self.continuecount = False
                 self.newlines = 0

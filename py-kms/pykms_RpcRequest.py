@@ -19,7 +19,7 @@ class handler(pykms_RpcBase.rpcBase):
                 request = byterize(request)
                 loggersrv.debug("RPC Message Request Bytes: \n%s\n" % justify(binascii.b2a_hex(self.data).decode('utf-8')))
                 loggersrv.debug("RPC Message Request: \n%s\n" % justify(request.dump(print_to_stdout = False)))
-                                
+
                 return request
 
         def generateResponse(self, request):
@@ -44,7 +44,7 @@ class handler(pykms_RpcBase.rpcBase):
                 response = byterize(response)
                 loggersrv.debug("RPC Message Response: \n%s\n" % justify(response.dump(print_to_stdout = False)))
                 loggersrv.debug("RPC Message Response Bytes: \n%s\n" % justify(deco(binascii.b2a_hex(enco(str(response), 'latin-1')), 'utf-8')))
-                
+
                 return response
 
         def generateRequest(self):
@@ -58,12 +58,12 @@ class handler(pykms_RpcBase.rpcBase):
                 request['call_id'] = self.srv_config['call_id']
                 request['alloc_hint'] = len(self.data)
                 request['pduData'] = str(self.data)
-                
+
                 pretty_printer(num_text = 11, where = "clt")
                 request = byterize(request)
                 loggersrv.debug("RPC Message Request: \n%s\n" % justify(request.dump(print_to_stdout = False)))
                 loggersrv.debug("RPC Message Request Bytes: \n%s\n" % justify(deco(binascii.b2a_hex(enco(str(request), 'latin-1')), 'utf-8')))
-                
+
                 return request
 
         def parseResponse(self):

@@ -69,21 +69,21 @@ class kmsRequestV5(kmsBase):
 
         def executeRequestLogic(self):
                 requestData = self.RequestV5(self.data)
-        
+
                 decrypted = self.decryptRequest(requestData)
 
                 responseBuffer = self.serverLogic(decrypted['request'])
-        
+
                 iv, encrypted = self.encryptResponse(requestData, decrypted, responseBuffer)
 
                 responseData = self.generateResponse(iv, encrypted, requestData)
 
                 return responseData
-        
+
         def decryptRequest(self, request):
                 encrypted = bytearray(enco(str(request['message']), 'latin-1'))
                 iv = bytearray(enco(request['message']['salt'], 'latin-1'))
-                
+
                 moo = aes.AESModeOfOperation()
                 moo.aes.v6 = self.v6
                 decrypted = moo.decrypt(encrypted, 256, moo.ModeOfOperation["CBC"], self.key, moo.aes.KeySize["SIZE_128"], iv)
@@ -94,7 +94,7 @@ class kmsRequestV5(kmsBase):
 
         def encryptResponse(self, request, decrypted, response):
                 randomSalt = self.getRandomSalt()
-                result = hashlib.sha256(randomSalt).digest()               
+                result = hashlib.sha256(randomSalt).digest()
                 iv = bytearray(enco(request['message']['salt'], 'latin-1'))
 
                 randomStuff = bytearray(16)
@@ -105,17 +105,17 @@ class kmsRequestV5(kmsBase):
                 responsedata['response'] = response
                 responsedata['keys'] = bytes(randomStuff)
                 responsedata['hash'] = result
-                
+
                 padded = aes.append_PKCS7_padding(enco(str(responsedata), 'latin-1'))
                 moo = aes.AESModeOfOperation()
                 moo.aes.v6 = self.v6
                 mode, orig_len, crypted = moo.encrypt(padded, moo.ModeOfOperation["CBC"], self.key, moo.aes.KeySize["SIZE_128"], iv)
-                
+
                 return bytes(iv), bytes(bytearray(crypted))
-        
+
         def decryptResponse(self, response):
                 paddingLength = self.getPadding(response['bodyLength1'])
-                
+
                 iv = bytearray(enco(response['salt'], 'latin-1'))
                 encrypted = bytearray(enco(response['encrypted'][:-paddingLength], 'latin-1'))
                 moo = aes.AESModeOfOperation()
@@ -125,10 +125,10 @@ class kmsRequestV5(kmsBase):
                 decrypted = bytes(bytearray(decrypted))
 
                 return self.DecryptedResponse(decrypted)
-                
+
         def getRandomSalt(self):
                 return bytearray(random.getrandbits(8) for i in range(16))
-        
+
         def generateResponse(self, iv, encryptedResponse, requestData):
                 response = self.ResponseV5()
                 bodyLength = 2 + 2 + len(iv) + len(encryptedResponse)
@@ -141,12 +141,12 @@ class kmsRequestV5(kmsBase):
                 response['padding'] = bytes(bytearray(self.getPadding(bodyLength)))
 
                 pretty_printer(num_text = 16, where = "srv")
-                response = byterize(response) 
+                response = byterize(response)
                 loggersrv.info("KMS V%d Response: \n%s\n" % (self.ver, justify(response.dump(print_to_stdout = False))))
                 loggersrv.info("KMS V%d Structure Bytes: \n%s\n" % (self.ver, justify(deco(binascii.b2a_hex(enco(str(response), 'latin-1')), 'utf-8'))))
-                                                        
+
                 return str(response)
-        
+
         def generateRequest(self, requestBase):
                 esalt = self.getRandomSalt()
 
@@ -176,5 +176,5 @@ class kmsRequestV5(kmsBase):
                 request = byterize(request)
                 loggersrv.info("Request V%d Data: \n%s\n" % (self.ver, justify(request.dump(print_to_stdout = False))))
                 loggersrv.info("Request V%d: \n%s\n" % (self.ver, justify(deco(binascii.b2a_hex(enco(str(request), 'latin-1')), 'utf-8'))))
-                
+
                 return request

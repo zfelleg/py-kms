@@ -52,7 +52,7 @@ class kmsRequestV4(kmsBase):
                 responseData = self.generateResponse(response, thehash)
 
                 time.sleep(1) # request sent back too quick for Windows 2008 R2, slow it down.
-                
+
                 return responseData
 
         def generateHash(self, message):
@@ -69,7 +69,7 @@ class kmsRequestV4(kmsBase):
                 aes = AES()
 
                 messageSize = len(message)
-                lastBlock = bytearray(16) 
+                lastBlock = bytearray(16)
                 hashBuffer = bytearray(16)
 
                 # MessageSize / Blocksize.
@@ -103,30 +103,30 @@ class kmsRequestV4(kmsBase):
                 response['response'] = responseBuffer
                 response['hash'] = thehash
                 response['padding'] = bytes(bytearray(self.getPadding(bodyLength)))
-                
+
                 ## Debug stuff.
                 pretty_printer(num_text = 16, where = "srv")
                 response = byterize(response)
                 loggersrv.debug("KMS V4 Response: \n%s\n" % justify(response.dump(print_to_stdout = False)))
                 loggersrv.debug("KMS V4 Response Bytes: \n%s\n" % justify(deco(binascii.b2a_hex(enco(str(response), 'latin-1')), 'utf-8')))
-                        
+
                 return str(response)
 
         def generateRequest(self, requestBase):
                 thehash = self.generateHash(bytearray(enco(str(requestBase), 'latin-1')))
 
                 request = kmsRequestV4.RequestV4()
-                bodyLength = len(requestBase) + len(thehash)               
+                bodyLength = len(requestBase) + len(thehash)
                 request['bodyLength1'] = bodyLength
                 request['bodyLength2'] = bodyLength
                 request['request'] = requestBase
                 request['hash'] = thehash
                 request['padding'] = bytes(bytearray(self.getPadding(bodyLength)))
- 
+
                 ## Debug stuff.
                 pretty_printer(num_text = 10, where = "clt")
                 request = byterize(request)
                 loggersrv.debug("Request V4 Data: \n%s\n" % justify(request.dump(print_to_stdout = False)))
                 loggersrv.debug("Request V4: \n%s\n" % justify(deco(binascii.b2a_hex(enco(str(request), 'latin-1')), 'utf-8')))
-                                
+
                 return request

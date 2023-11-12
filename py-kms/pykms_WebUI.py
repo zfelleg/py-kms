@@ -138,4 +138,4 @@ def products():
         count_products_windows=countProductsWindows,
         count_products_office=countProductsOffice
     )
-    
+

@@ -23,11 +23,11 @@ def epidGenerator(kmsId, version, lcid):
                                 pkeys.append( (csvlkitem['GroupId'], csvlkitem['MinKeyId'], csvlkitem['MaxKeyId'], csvlkitem['InvalidWinBuild']) )
                         else:
                                 # fallback to Windows Server 2019 parameters.
-                                pkeys.append( ('206', '551000000', '570999999', '[0,1,2]') )   
+                                pkeys.append( ('206', '551000000', '570999999', '[0,1,2]') )
                 except IndexError:
                         # fallback to Windows Server 2019 parameters.
-                        pkeys.append( ('206', '551000000', '570999999', '[0,1,2]') )   
-                                
+                        pkeys.append( ('206', '551000000', '570999999', '[0,1,2]') )
+
         pkey = random.choice(pkeys)
         GroupId, MinKeyId, MaxKeyId, Invalid = int(pkey[0]), int(pkey[1]), int(pkey[2]), literal_eval(pkey[3])
 
@@ -41,7 +41,7 @@ def epidGenerator(kmsId, version, lcid):
                 except KeyError:
                         # fallback to Windows Server 2019 parameters.
                         hosts.append( {'BuildNumber':'17763', 'PlatformId':'3612', 'MinDate':'02/10/2018'} )
-                                
+
         host = random.choice(hosts)
         BuildNumber, PlatformId, MinDate = host['BuildNumber'], host['PlatformId'], host['MinDate']
 
@@ -56,7 +56,7 @@ def epidGenerator(kmsId, version, lcid):
 
         # Generate Part 8: KMS Host Activation Date
         d = datetime.datetime.strptime(MinDate, "%d/%m/%Y")
-        minTime = datetime.date(d.year, d.month, d.day)       
+        minTime = datetime.date(d.year, d.month, d.day)
 
         # Generate Year and Day Number
         randomDate = datetime.date.fromtimestamp(random.randint(int(time.mktime(minTime.timetuple())), int(time.mktime(datetime.datetime.now().timetuple()))))
@@ -81,5 +81,5 @@ def epidGenerator(kmsId, version, lcid):
         result.append(".0000-")
         result.append(str(randomDayNumber).rjust(3, "0"))
         result.append(str(randomDate.year).rjust(4, "0"))
-        
+
         return "".join(result)

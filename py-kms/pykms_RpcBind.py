@@ -82,14 +82,14 @@ class handler(pykms_RpcBase.rpcBase):
                 loggersrv.debug("RPC Bind Request Bytes: \n%s\n" % justify(deco(binascii.b2a_hex(self.data), 'utf-8')))
                 loggersrv.debug("RPC Bind Request: \n%s\n%s\n" % (justify(request.dump(print_to_stdout = False)),
                                                                   justify(MSRPCBind(request['pduData']).dump(print_to_stdout = False))))
-                
+
                 return request
 
         def generateResponse(self, request):
                 response = MSRPCBindAck()
-                
+
                 bind = MSRPCBind(request['pduData'])
-                               
+
                 response['ver_major'] = request['ver_major']
                 response['ver_minor'] = request['ver_minor']
                 response['type'] = self.packetType['bindAck']
@@ -125,7 +125,7 @@ class handler(pykms_RpcBase.rpcBase):
                 response = byterize(response)
                 loggersrv.debug("RPC Bind Response: \n%s\n" % justify(response.dump(print_to_stdout = False)))
                 loggersrv.debug("RPC Bind Response Bytes: \n%s\n" % justify(deco(binascii.b2a_hex(enco(str(response), 'latin-1')), 'utf-8')))
-                
+
                 return response
 
         def generateRequest(self):
@@ -153,7 +153,7 @@ class handler(pykms_RpcBase.rpcBase):
                 bind['assoc_group'] = 0
                 bind['ctx_num'] = 2
                 bind['ctx_items'] = str(bind.CtxItemArray(str(firstCtxItem) + str(secondCtxItem)))
-                     
+
                 request = MSRPCHeader()
                 request['ver_major'] = 5
                 request['ver_minor'] = 0
@@ -168,7 +168,7 @@ class handler(pykms_RpcBase.rpcBase):
                 loggersrv.debug("RPC Bind Request: \n%s\n%s\n" % (justify(request.dump(print_to_stdout = False)),
                                                                   justify(MSRPCBind(request['pduData']).dump(print_to_stdout = False))))
                 loggersrv.debug("RPC Bind Request Bytes: \n%s\n" % justify(deco(binascii.b2a_hex(enco(str(request), 'latin-1')), 'utf-8')))
-                                
+
                 return request
 
         def parseResponse(self):

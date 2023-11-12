@@ -29,7 +29,7 @@ class kmsBase:
         def __init__(self, data, srv_config):
                 self.data = data
                 self.srv_config = srv_config
-                
+
         class kmsRequestStruct(Structure):
                 commonHdr = ()
                 structure = (
@@ -52,7 +52,7 @@ class kmsBase:
 
                 def getMachineName(self):
                         return self['machineName'].decode('utf-16le')
-                
+
                 def getLicenseStatus(self):
                         return kmsBase.licenseStates[self['licenseStatus']] or "Unknown"
 
@@ -100,7 +100,7 @@ class kmsBase:
                 'extendedGrace' : 6
         }
 
-        
+
         def getPadding(self, bodyLength):
                 ## https://forums.mydigitallife.info/threads/71213-Source-C-KMS-Server-from-Microsoft-Toolkit?p=1277542&viewfull=1#post1277542
                 return 4 + (((~bodyLength & 3) + 1) & 3)
@@ -108,14 +108,14 @@ class kmsBase:
         def serverLogic(self, kmsRequest):
                 pretty_printer(num_text = 15, where = "srv")
                 kmsRequest = byterize(kmsRequest)
-                loggersrv.debug("KMS Request Bytes: \n%s\n" % justify(deco(binascii.b2a_hex(enco(str(kmsRequest), 'latin-1')), 'latin-1')))                         
+                loggersrv.debug("KMS Request Bytes: \n%s\n" % justify(deco(binascii.b2a_hex(enco(str(kmsRequest), 'latin-1')), 'latin-1')))
                 loggersrv.debug("KMS Request: \n%s\n" % justify(kmsRequest.dump(print_to_stdout = False)))
-                                        
+
                 clientMachineId = kmsRequest['clientMachineId'].get()
                 applicationId = kmsRequest['applicationId'].get()
                 skuId = kmsRequest['skuId'].get()
                 requestDatetime = filetime_to_dt(kmsRequest['requestTime'])
-                                
+
                 # Localize the request time, if module "tzlocal" is available.
                 try:
                         from datetime import datetime
@@ -138,8 +138,8 @@ class kmsBase:
                     pass
 
                 # Activation threshold.
-                # https://docs.microsoft.com/en-us/windows/deployment/volume-activation/activate-windows-10-clients-vamt                
-                MinClients = kmsRequest['requiredClientCount'] 
+                # https://docs.microsoft.com/en-us/windows/deployment/volume-activation/activate-windows-10-clients-vamt
+                MinClients = kmsRequest['requiredClientCount']
                 RequiredClients = MinClients * 2
                 if self.srv_config["clientcount"] != None:
                         if 0 < self.srv_config["clientcount"] < MinClients:
@@ -160,17 +160,17 @@ could be detected as not genuine !{end}" %currentClientCount)
                                                        put_text = "{reverse}{yellow}{bold}Too many clients ! Fixed with %s{end}" %currentClientCount)
                 else:
                         # fixed to 10 (product server) or 50 (product desktop)
-                        currentClientCount = RequiredClients     
+                        currentClientCount = RequiredClients
 
-                        
-                # Get a name for SkuId, AppId.        
+
+                # Get a name for SkuId, AppId.
                 kmsdb = kmsDB2Dict()
                 appName, skuName = str(applicationId), str(skuId)
- 
+
                 appitems = kmsdb[2]
                 for appitem in appitems:
                         kmsitems = appitem['KmsItems']
-                        for kmsitem in kmsitems:                                       
+                        for kmsitem in kmsitems:
                                 skuitems = kmsitem['SkuItems']
                                 for skuitem in skuitems:
                                         try:
@@ -181,7 +181,7 @@ could be detected as not genuine !{end}" %currentClientCount)
                                                 skuName = skuId
                                                 pretty_printer(log_obj = loggersrv.warning,
                                                                put_text = "{reverse}{yellow}{bold}Can't find a name for this product !{end}")
-                                    
+
                         try:
                                 if uuid.UUID(appitem['Id']) == applicationId:
                                         appName = appitem['DisplayName']
@@ -206,7 +206,7 @@ could be detected as not genuine !{end}" %currentClientCount)
                 loggersrv.info("SKU ID: %s" % infoDict["skuId"])
                 loggersrv.info("License Status: %s" % infoDict["licenseStatus"])
                 loggersrv.info("Request Time: %s" % local_dt.strftime('%Y-%m-%d %H:%M:%S %Z (UTC%z)'))
-                
+
                 if self.srv_config['loglevel'] == 'MININFO':
                         loggersrv.mininfo("", extra = {'host': str(self.srv_config['raddr']),
                                                        'status' : infoDict["licenseStatus"],
@@ -221,7 +221,7 @@ could be detected as not genuine !{end}" %currentClientCount)
                 response = self.kmsResponseStruct()
                 response['versionMinor'] = kmsRequest['versionMinor']
                 response['versionMajor'] = kmsRequest['versionMajor']
-                
+
                 if not self.srv_config["epid"]:
                         response["kmsEpid"] = epidGenerator(kmsRequest['kmsCountedId'].get(), kmsRequest['versionMajor'],
                                                             self.srv_config["lcid"]).encode('utf-16le')
@@ -240,7 +240,7 @@ could be detected as not genuine !{end}" %currentClientCount)
                         sql_update_epid(self.srv_config['sqlite'], kmsRequest, response, appName)
 
                 loggersrv.info("Server ePID: %s" % response["kmsEpid"].decode('utf-16le'))
-                        
+
                 return response
 
 
@@ -252,7 +252,7 @@ def generateKmsResponseData(data, srv_config):
 
         if version == 4:
                 loggersrv.info("Received V%d request on %s." % (version, currentDate))
-                messagehandler = pykms_RequestV4.kmsRequestV4(data, srv_config)     
+                messagehandler = pykms_RequestV4.kmsRequestV4(data, srv_config)
         elif version == 5:
                 loggersrv.info("Received V%d request on %s." % (version, currentDate))
                 messagehandler = pykms_RequestV5.kmsRequestV5(data, srv_config)
@@ -262,5 +262,5 @@ def generateKmsResponseData(data, srv_config):
         else:
                 loggersrv.info("Unhandled KMS version V%d." % version)
                 messagehandler = pykms_RequestUnknown.kmsRequestUnknown(data, srv_config)
-                
+
         return messagehandler.executeRequestLogic()

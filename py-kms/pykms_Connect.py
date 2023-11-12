@@ -26,8 +26,8 @@ def create_server_sock(address, *, family = socket.AF_INET, backlog = None, reus
         """ Convenience function which creates a SOCK_STREAM type socket
             bound to *address* (a 2-tuple (host, port)) and return the socket object.
             Internally it takes care of choosing the right address family (IPv4 or IPv6),depending on
-            the host specified in *address* tuple. 
-        
+            the host specified in *address* tuple.
+
             *family*          should be either AF_INET or AF_INET6.
             *backlog*         is the queue size passed to socket.listen().
             *reuse_port*      if True and the platform supports it, we will use the SO_REUSEPORT socket option.
@@ -37,13 +37,13 @@ def create_server_sock(address, *, family = socket.AF_INET, backlog = None, reus
         if reuse_port and not hasattr(socket._socket, "SO_REUSEPORT"):
                 pretty_printer(log_obj = loggersrv.warning, put_text = "{reverse}{yellow}{bold}SO_REUSEPORT not supported on this platform - ignoring socket option.{end}")
                 reuse_port = False
-        
+
         if dualstack_ipv6:
                 if not has_dualstack_ipv6():
                         raise ValueError("dualstack_ipv6 not supported on this platform")
                 if family != socket.AF_INET6:
                         raise ValueError("dualstack_ipv6 requires AF_INET6 family")
-                        
+
         sock = socket.socket(family, socket.SOCK_STREAM)
         try:
                 # Note about Windows. We don't set SO_REUSEADDR because:
@@ -104,9 +104,9 @@ class MultipleListener(object):
                         for addr in addresses:
                                 addr = self.check(addr)
                                 ip_ver = ipaddress.ip_address(addr[0])
-                                
+
                                 if ip_ver.version == 4 and want_dual:
-                                        self.cant_dual.append(addr[0])                                
+                                        self.cant_dual.append(addr[0])
 
                                 sock = create_server_sock((addr[0], addr[1]),
                                                           family = (socket.AF_INET if ip_ver.version == 4 else socket.AF_INET6),
@@ -120,7 +120,7 @@ class MultipleListener(object):
                 finally:
                         if not completed:
                                 self.close()
-                        
+
         def __enter__(self):
                 return self
 
@@ -155,13 +155,13 @@ class MultipleListener(object):
                         pollster = selectors.PollSelector
                 else:
                         pollster = selectors.SelectSelector
-                        
+
                 timeout = self.gettimeout()
-                
+
                 with pollster() as pollster:
                         self.register(pollster)
                         fds = pollster.select(timeout)
-                        
+
                         if timeout and fds == []:
                                 raise socket.timeout('timed out')
                         try:

@@ -77,7 +77,7 @@ class kmsRequestV6(kmsRequestV5):
 
                 # HMacKey
                 requestTime = decrypted['request']['requestTime']
-                HMacKey = self.getMACKey(requestTime)                
+                HMacKey = self.getMACKey(requestTime)
                 HMac = hmac.new(HMacKey, bytes(HMacMsg), hashlib.sha256)
                 digest = HMac.digest()
 
@@ -89,7 +89,7 @@ class kmsRequestV6(kmsRequestV5):
                 mode, orig_len, crypted = moo.encrypt(padded, moo.ModeOfOperation["CBC"], self.key, moo.aes.KeySize["SIZE_128"], SaltS)
 
                 return bytes(SaltS), bytes(bytearray(crypted))
-        
+
 
         def getMACKey(self, t):
                 c1 = 0x00000022816889BD
@@ -105,4 +105,4 @@ class kmsRequestV6(kmsRequestV5):
                 digest = sha256.digest()
 
                 return digest[16:]
-        
+

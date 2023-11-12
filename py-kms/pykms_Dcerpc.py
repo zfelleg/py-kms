@@ -13,11 +13,11 @@
 #   so you understand what the call does, and then read the test case located
 #   at https://github.com/SecureAuthCorp/impacket/tree/master/tests/SMB_RPC
 #
-# ToDo: 
+# ToDo:
 # [ ] Take out all the security provider stuff out of here (e.g. RPC_C_AUTHN_WINNT)
-#     and put it elsewhere. This will make the coder cleaner and easier to add 
+#     and put it elsewhere. This will make the coder cleaner and easier to add
 #     more SSP (e.g. NETLOGON)
-# 
+#
 """
 Stripped down version of:
 https://github.com/SecureAuthCorp/impacket/blob/master/impacket/dcerpc/v5/rpcrt.py
@@ -113,7 +113,7 @@ rpc_cont_def_result = {
 rpc_status_codes = {
     0x00000005 : 'rpc_s_access_denied',
     0x00000008 : 'Authentication type not recognized',
-    0x000006D8 : 'rpc_fault_cant_perform', 
+    0x000006D8 : 'rpc_fault_cant_perform',
     0x000006C6 : 'rpc_x_invalid_bound',                # the arrays bound are invalid
     0x000006E4 : 'rpc_s_cannot_support: The requested operation is not supported.',               # some operation is not supported
     0x000006F7 : 'rpc_x_bad_stub_data',                # the stub data is invalid, doesn't match with the IDL definition
@@ -562,7 +562,7 @@ class SEC_TRAILER(Structure):
 
 class MSRPCHeader(Structure):
     _SIZE = 16
-    commonHdr = ( 
+    commonHdr = (
         ('ver_major','B=5'),                              # 0
         ('ver_minor','B=0'),                              # 1
         ('type','B=0'),                                   # 2
@@ -573,9 +573,9 @@ class MSRPCHeader(Structure):
         ('call_id','<L=1'),                               # 12    <-- Common up to here (including this)
     )
 
-    structure = ( 
+    structure = (
         ('dataLen','_-pduData','self["frag_len"]-self["auth_len"]-self._SIZE-(8 if self["auth_len"] > 0 else 0)'),
-        ('pduData',':'),                                
+        ('pduData',':'),
         ('_pad', '_-pad','(4 - ((self._SIZE + (16 if (self["flags"] & 0x80) > 0 else 0) + len(self["pduData"])) & 3) & 3)'),
         ('pad', ':'),
         ('_sec_trailer', '_-sec_trailer', '8 if self["auth_len"] > 0 else 0'),
@@ -604,8 +604,8 @@ class MSRPCHeader(Structure):
     def get_packet(self):
         if self['auth_data'] != b'':
             self['auth_len'] = len(self['auth_data'])
-        # The sec_trailer structure MUST be 4-byte aligned with respect to 
-        # the beginning of the PDU. Padding octets MUST be used to align the 
+        # The sec_trailer structure MUST be 4-byte aligned with respect to
+        # the beginning of the PDU. Padding octets MUST be used to align the
         # sec_trailer structure if its natural beginning is not already 4-byte aligned
         ##self['pad'] = '\xAA' * (4 - ((self._SIZE + len(self['pduData'])) & 3) & 3)
 
@@ -613,7 +613,7 @@ class MSRPCHeader(Structure):
 
 class MSRPCRequestHeader(MSRPCHeader):
     _SIZE = 24
-    commonHdr = MSRPCHeader.commonHdr + ( 
+    commonHdr = MSRPCHeader.commonHdr + (
         ('alloc_hint','<L=0'),                            # 16
         ('ctx_id','<H=0'),                                # 20
         ('op_num','<H=0'),                                # 22
@@ -630,8 +630,8 @@ class MSRPCRequestHeader(MSRPCHeader):
 
 class MSRPCRespHeader(MSRPCHeader):
     _SIZE = 24
-    commonHdr = MSRPCHeader.commonHdr + ( 
-        ('alloc_hint','<L=0'),                          # 16   
+    commonHdr = MSRPCHeader.commonHdr + (
+        ('alloc_hint','<L=0'),                          # 16
         ('ctx_id','<H=0'),                              # 20
         ('cancel_count','<B=0'),                        # 22
         ('padding','<B=0'),                             # 23
@@ -645,7 +645,7 @@ class MSRPCRespHeader(MSRPCHeader):
 
 class MSRPCBind(Structure):
     _CTX_ITEM_LEN = len(CtxItem())
-    structure = ( 
+    structure = (
         ('max_tfrag','<H=4280'),
         ('max_rfrag','<H=4280'),
         ('assoc_group','<L=0'),
@@ -655,7 +655,7 @@ class MSRPCBind(Structure):
         ('_ctx_items', '_-ctx_items', 'self["ctx_num"]*self._CTX_ITEM_LEN'),
         ('ctx_items',':'),
     )
- 
+
     def __init__(self, data = None, alignment = 0):
         Structure.__init__(self, data, alignment)
         if data is None:
@@ -668,7 +668,7 @@ class MSRPCBind(Structure):
 
     def addCtxItem(self, item):
         self.__ctx_items.append(item)
-    
+
     def getData(self):
         self['ctx_num'] = len(self.__ctx_items)
         for i in self.__ctx_items:
@@ -678,11 +678,11 @@ class MSRPCBind(Structure):
 class MSRPCBindAck(MSRPCHeader):
     _SIZE = 26 # Up to SecondaryAddr
     _CTX_ITEM_LEN = len(CtxItemResult())
-    structure = ( 
+    structure = (
         ('max_tfrag','<H=0'),
         ('max_rfrag','<H=0'),
         ('assoc_group','<L=0'),
-        ('SecondaryAddrLen','<H&SecondaryAddr'), 
+        ('SecondaryAddrLen','<H&SecondaryAddr'),
         ('SecondaryAddr','z'),                          # Optional if SecondaryAddrLen == 0
         ('PadLen','_-Pad','(4-((self["SecondaryAddrLen"]+self._SIZE) % 4))%4'),
         ('Pad',':'),
@@ -719,9 +719,9 @@ class MSRPCBindAck(MSRPCHeader):
             item = CtxItemResult(data)
             self.__ctx_items.append(item)
             data = data[len(item):]
-            
+
 class MSRPCBindNak(Structure):
-    structure = ( 
+    structure = (
         ('RejectedReason','<H=0'),
         ('SupportedVersions',':'),
     )

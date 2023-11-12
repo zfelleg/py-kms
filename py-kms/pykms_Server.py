@@ -329,7 +329,7 @@ def server_check():
         if srv_config['hwid'] == "RANDOM":
                 randomhwid = uuid.uuid4().hex
                 srv_config['hwid'] = randomhwid[:16]
-           
+
         # Sanitize HWID.
         hexstr = srv_config['hwid']
         # Strip 0x from the start of hexstr
@@ -359,7 +359,7 @@ def server_check():
 
         # Check LCID.
         srv_config['lcid'] = check_lcid(srv_config['lcid'], loggersrv.warning)
-                                
+
         # Check sqlite.
         if srv_config['sqlite']:
                 if srv_config['sqlite'] is True: # Resolve bool to the default path
@@ -488,7 +488,7 @@ class kmsServerHandler(socketserver.BaseRequestHandler):
                                 pretty_printer(log_obj = loggersrv.error,
                                                put_text = "{reverse}{red}{bold}While receiving: %s{end}" %str(e))
                                 break
-                        
+
                         packetType = MSRPCHeader(self.data)['type']
                         if packetType == rpcBase.packetType['bindReq']:
                                 loggersrv.info("RPC bind request received.")

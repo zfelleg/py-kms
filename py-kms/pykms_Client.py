@@ -153,7 +153,7 @@ def client_check():
                 except UnicodeEncodeError:
                         pretty_printer(log_obj = loggerclt.error, to_exit = True, where = "clt",
                                        put_text = "{reverse}{red}{bold}argument `-n/--name`: invalid with: '%s'. Exiting...{end}" %clt_config['machine'])
-                        
+
         clt_config['call_id'] = 1
 
         # Check other specific client options.
@@ -169,7 +169,7 @@ def client_update():
         appitems = kmsdb[2]
         for appitem in appitems:
                 kmsitems = appitem['KmsItems']
-                for kmsitem in kmsitems:                                
+                for kmsitem in kmsitems:
                         name = re.sub(r'\(.*\)', '', kmsitem['DisplayName']) # Remove bracets
                         name = name.replace('2015', '') # Remove specific years
                         name = name.replace(' ', '') # Ignore whitespaces
@@ -271,7 +271,7 @@ def client_create(clt_sock):
                 parsed = MSRPCRespHeader(response)
                 kmsData = readKmsResponse(parsed['pduData'], kmsRequest, clt_config)
                 kmsResp = kmsData['response']
-                
+
                 try:
                         hwid = kmsData['hwid']
                         loggerclt.info("KMS Host HWID: %s" % deco(binascii.b2a_hex(enco(hwid, 'latin-1')).upper(), 'utf-8'))
@@ -281,14 +281,14 @@ def client_create(clt_sock):
                 loggerclt.info("KMS Host Current Client Count: %s" % kmsResp['currentClientCount'])
                 loggerclt.info("KMS VL Activation Interval: %s" % kmsResp['vLActivationInterval'])
                 loggerclt.info("KMS VL Renewal Interval: %s" % kmsResp['vLRenewalInterval'])
-                
+
                 if clt_config['loglevel'] == 'MININFO':
                         loggerclt.mininfo("", extra = {'host': str(clt_sock.getpeername()),
                                                        'status' : kmsBase.licenseStates[requester.srv_config['KMSClientLicenseStatus']],
                                                        'product' : clt_config["mode"]})
 
                 pretty_printer(num_text = 21, where = "clt")
-                
+
         elif packetType == rpcBase.packetType['bindNak']:
                 loggerclt.info(justify(MSRPCBindNak(bindResponse).dump(print_to_stdout = False)))
                 sys.exit(0)
@@ -332,7 +332,7 @@ def createKmsRequestBase():
         requestDict['machineName'] = (clt_config['machine'] if (clt_config['machine'] is not None) else
                                       ''.join(random.choice(string.ascii_letters + string.digits) for i in range(random.randint(2,63)))).encode('utf-16le')
         requestDict['mnPad'] = '\0'.encode('utf-16le') * (63 - len(requestDict['machineName'].decode('utf-16le')))
-        
+
         # Debug Stuff
         pretty_printer(num_text = 9, where = "clt")
         requestDict = byterize(requestDict)

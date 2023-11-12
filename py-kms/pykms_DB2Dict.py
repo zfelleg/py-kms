@@ -14,9 +14,9 @@ def kmsDB2Dict():
         ## Get winbuilds.
         for winbuild in root.iter('WinBuild'):
                 child1.append(winbuild.attrib)
-        
+
         kmsdb.append(child1)
-        
+
         ## Get csvlkitem data.
         child1 = []
         for csvlk in root.iter('CsvlkItem'):
@@ -25,7 +25,7 @@ def kmsDB2Dict():
                         csvlk.attrib.update({'Activate' : child2})
                 child1.append(csvlk.attrib)
                 child2 = []
-                
+
         kmsdb.append(child1)
 
         ## Get appitem data.
@@ -38,10 +38,10 @@ def kmsDB2Dict():
                         child2.append(kms.attrib)
                         child3 = []
 
-                app.attrib.update({'KmsItems' : child2})       
+                app.attrib.update({'KmsItems' : child2})
                 child1.append(app.attrib)
                 child2 = []
-                
+
         kmsdb.append(child1)
 
         return kmsdb
